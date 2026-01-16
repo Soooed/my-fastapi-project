@@ -2,14 +2,18 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
 
-# Для создания пользователя
-class UserCreate(BaseModel):
+class UserBase(BaseModel):
     username: str
     email: EmailStr
 
-# Для ответа
-class UserResponse(BaseModel):
+class UserCreate(UserBase):
+    pass
+
+# Для обновления - все поля опциональны
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+
+class UserResponse(UserBase):
     id: int
-    username: str
-    email: str
     created_at: Optional[datetime] = None
