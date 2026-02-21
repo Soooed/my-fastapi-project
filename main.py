@@ -106,7 +106,7 @@ def get_users(
             "total": total,
             "skip": skip,
             "limit": limit,
-            "has_more": (skip + len(users)) < total
+            "has_more": (skip + len(users)) < total if isinstance(total, int) else False
         }
     except Exception as e:
         raise HTTPException(
@@ -270,12 +270,10 @@ def update_user(
             check_params = {"id": user_id}
             
             conditions = []
-            if "username" in update_data:
-                conditions.append("(username = :new_username AND id != :id)")
-                check_params["new_username"] = update_data["username"]
-            if "email" in update_data:
-                conditions.append("(email = :new_email AND id != :id)")
-                check_params["new_email"] = update_data["email"]
+            if user_update.username is not None:
+                update_data["username"] = user_update.username
+            if user_update.email is not None:
+                update_data["email"] = str(user_update.email) if user_update.email else None
             
             check_query += " OR ".join(conditions)
             conflict = db.execute(text(check_query), check_params).fetchone()
